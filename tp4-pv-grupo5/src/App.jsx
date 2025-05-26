@@ -1,35 +1,66 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 //import './App.css'
+import ProductForm from './components/ProductForm';
+import ProductList from './components/ProductList';
+import SearchBar from './components/SearchBar';
 
-//function App() {
-//  const [count, setCount] = useState(0)
+const App = ()=>{
+  const [products, setProducts] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-//  return (
-//    <>
-//      <div>
-//        <a href="https://vite.dev" target="_blank">
-//          <img src={viteLogo} className="logo" alt="Vite logo" />
-//        </a>
-//        <a href="https://react.dev" target="_blank">
-//          <img src={reactLogo} className="logo react" alt="React logo" />
-//        </a>
-//      </div>
-//      <h1>Vite + React</h1>
-//      <div className="card">
-//        <button onClick={() => setCount((count) => count + 1)}>
-//          count is {count}
-//        </button>
-//        <p>
-//          Edit <code>src/App.jsx</code> and save to test HMR
-//        </p>
-//      </div>
-//      <p className="read-the-docs">
-//        Click on the Vite and React logos to learn more
-//      </p>
-//    </>
-//  )
-//}
+  useEffect(()=>{
+    console.log(`Producto Actualizados ${products}`);
+  },[products]);
 
-//export default App
+  const addProduct=useCallback((product) =>{
+    setProducts(prev => [...prev, product]);
+  },[]);
+
+  const lastAddProduct=useRef(addProduct);
+  useEffect(() => {
+    console.log(lastAddProduct.current === addProduct);
+  },[addProduct]);
+
+  const updateProduct = useCallback((updateProduct) => {
+    setProducts(prev =>
+      prev.map(p =>(p.id === updateProduct.id ? updateProduct : p))
+    );
+  },[]);
+
+  const deleteProduct = useCallback((id)=>{
+    setProducts(prev => prev.filter(p=> p.id !== id));
+  },[]);
+
+  const handleAddOrUpdate = useCallback((product) => {
+    const exists = products.find(p => p.id === product.id)
+    if(exists){
+      updateProduct(product)
+    }else{
+      addProduct(product)
+    }
+    setEditingProduct(null);
+  },[products, addProduct, updateProduct]);
+
+  const handleEdit = useCallback((product)=>{
+    setEditingProduct(product);
+  },[]);
+
+  const filteredProducts = useMemo(()=>{
+    return products.filter(p =>
+      p.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.id.includes(searchTerm)
+    );
+  },[products, searchTerm]);
+
+  return (
+    <div>
+      <h1>Gestion del Producto</h1>
+      <ProductForm onSubmit={handleAddOrUpdate} editingProduct={editingProduct}/>
+      <SearchBar value={searchTerm} onChange={setSearchTerm}/>
+      <ProductList products={filteredProducts} onDelete={deleteProduct} onEdit={handleEdit} />
+    </div>
+  );
+};
+
+export default App
