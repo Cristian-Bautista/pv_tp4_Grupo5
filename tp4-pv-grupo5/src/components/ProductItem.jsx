@@ -1,8 +1,9 @@
 import React from 'react';
-
+import './ProductItem.css';
+  
 const ProductItem = ({ product, onEdit, onDelete }) => {
   return (
-    <li>
+    <li className='product-item'>
       <strong>{product.descripcion}</strong>(ID:{product.id})<br/>
       Precio: ${product.precioUnitario} - Descuento: {product.descuento}%<br/>
       Precio con descuento: ${product.precioConDescuento}<br/>
