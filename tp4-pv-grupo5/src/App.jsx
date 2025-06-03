@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-//import './App.css'
+import './App.css'
 import ProductForm from './components/ProductForm';
 import ProductList from './components/ProductList';
 import SearchBar from './components/SearchBar';
